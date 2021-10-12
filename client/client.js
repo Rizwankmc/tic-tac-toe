@@ -1,33 +1,42 @@
 import { io } from "socket.io-client";
 import readline from "readline";
 
-const socket = io("http://localhost:3001");
+const socket = io("http://localhost:3001"); // connect to server
 
+// creating read and write variable
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
+// loggin message on connect to server
 socket.on("connect", () => {
   console.log("Connected to Server at port 3001");
 });
 
+// socket to listen for game start
 socket.on("gameStart", (data) => {
   console.log(
     `....Game Started....\n\n \tYour are player ${data.playerPosition}\n`
   );
+
+  // display for initial matrix
   data.matrix.forEach((row) => {
     console.log("\t", row.join(" "));
   });
   console.log("\n");
+
+  // game start with player 1
   if (data.playerPosition === 1) {
     playerAction(1);
   } else {
+    // waiting mesasge for player 2
     console.log("\n-----------------------------\n");
     console.log("Opponent is taking action");
   }
 });
 
+// socket to log updated matrix
 socket.on("updateMatrix", (data) => {
   data.matrix.forEach((row) => {
     console.log("\t", row.join(" "));
@@ -35,25 +44,30 @@ socket.on("updateMatrix", (data) => {
   console.log("\n");
 });
 
+// socket to listen player turn and player act on his turn
 socket.on("playerTurn", (data) => {
   playerAction(data.playerPosition);
 });
 
+// socket to get mesasge that opponent is taking action
 socket.on("waiting", () => {
   console.log("Opponent is taking action");
 });
 
+// socket to listen  wrong choice
 socket.on("notValid", (data) => {
   console.log("Not a valid position!");
   playerAction(data.playerPosition);
 });
 
+// socket to listen game winner and terminate connection
 socket.on("winner", (data) => {
   console.log("Winner is Player", data.winnner);
   socket.disconnect();
   process.exit();
 });
 
+// socket to listen finish trigger when one of the player press r for resign
 socket.on("finish", (data) => {
   console.log(
     `Player ${data.resignBy} resigned \n Player ${data.winner} is winner`
@@ -62,16 +76,19 @@ socket.on("finish", (data) => {
   process.exit();
 });
 
+// socket to log game result as tie
 socket.on("gametie", () => {
   console.log(`Game is tied`);
   socket.disconnect();
   process.exit();
 });
 
+// socket to log disconnection form server
 socket.on("disconnect", () => {
   console.log("Disconnected from Server");
 });
 
+// function to take player input and emit player act socket
 const playerAction = (playerPosition) => {
   try {
     console.log("\n-----------------------------\n");
@@ -95,6 +112,7 @@ const playerAction = (playerPosition) => {
   }
 };
 
+// keypress listener for player resign
 process.stdin.on("keypress", (chunk, key) => {
   if (key && key.name == "r") socket.emit("resign");
 });

@@ -1,6 +1,8 @@
-import { check } from "../utils/index.js";
+import { isWinner } from "../utils/index.js";
+
+// initial Setup
+
 let users = [];
-let games = [];
 let matrix = [
   [1, 2, 3],
   [4, 5, 6],
@@ -19,6 +21,7 @@ const socketConnection = (io) => {
         // check player length
         if (users.length === 2) {
           users.forEach((user, userIndex) => {
+            // socket to emit both player that game is started
             io.to(user).emit("gameStart", {
               playerPosition: userIndex + 1,
               matrix,
@@ -45,17 +48,15 @@ const socketConnection = (io) => {
         io.emit("updateMatrix", { matrix });
 
         // check winner
-        const hasWin =
-          check(matrix, 0, 0, 0, 1) || // First horizontal line
-          check(matrix, 1, 0, 0, 1) || // Second horizontal line
-          check(matrix, 2, 0, 0, 1) || // Third horizontal line
-          check(matrix, 0, 0, 1, 0) || // First vertical line
-          check(matrix, 0, 1, 1, 0) || // Second vertical line
-          check(matrix, 0, 2, 1, 0) || // Third vertical line
-          check(matrix, 0, 0, 1, 1) || // First diagonal
-          check(matrix, 0, 2, 1, -1); // Second diagonal
-        if (hasWin) {
+
+        if (isWinner(matrix)) {
+          // socket to emit winner
           io.emit("winner", { winnner: data.playerPosition });
+          matrix = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+          ];
         } else {
           // check for tie
           let istie = true;
@@ -65,10 +66,12 @@ const socketConnection = (io) => {
             })
           );
           if (istie) {
+            // socket to emit game tie message
             io.emit("gametie");
           }
         }
         if (isSpace) {
+          // emit socket playerTurn to switch turn and waiting message
           users.forEach((user, userIndex) => {
             if (data.playerPosition - 1 === userIndex) {
               io.to(user).emit("waiting");
@@ -80,10 +83,12 @@ const socketConnection = (io) => {
             }
           });
         } else {
+          // socket to emit player wrong choice if chocie is alreaddy taken
           socket.emit("notValid", { playerPosition: data.playerPosition });
         }
       });
 
+      // soccket to listen player resign
       socket.on("resign", () => {
         let loser = users.findIndex((el) => el === socket.id);
         let winner;
@@ -93,7 +98,9 @@ const socketConnection = (io) => {
         io.emit("finish", { resignBy: loser + 1, winner });
       });
 
+      // socket to player disconnect
       socket.on("disconnect", () => {
+        // remove player from users array on disconnect
         let index = users.findIndex((user) => user === socket.id);
         if (index !== -1) {
           users.splice(index, 1);
