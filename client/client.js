@@ -7,7 +7,6 @@ const regex =
 
 if (regex.test(serverPath)) {
   // connect to server
-  console.log("server =>", serverPath);
   const socket = io(serverPath);
 
   // creating read and write variable

@@ -68,6 +68,11 @@ const socketConnection = (io) => {
           if (istie) {
             // socket to emit game tie message
             io.emit("gametie");
+            matrix = [
+              [1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9],
+            ];
           }
         }
         if (isSpace) {
@@ -96,6 +101,11 @@ const socketConnection = (io) => {
           winner = 2;
         } else winner = 1;
         io.emit("finish", { resignBy: loser + 1, winner });
+        matrix = [
+          [1, 2, 3],
+          [4, 5, 6],
+          [7, 8, 9],
+        ];
       });
 
       // socket to player disconnect
