@@ -26,5 +26,8 @@ open other two terminal to run client cli locally
 
 npm run client http://localhost:3001
 
+## snapshot
+![alt text](https://github.com/Rizwankmc/tic-tac-toe/blob/main/snapshot.PNG)
+
 
 
