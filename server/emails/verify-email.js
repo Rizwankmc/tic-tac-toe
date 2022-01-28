@@ -104,7 +104,7 @@ const html = (
 
                     <p class="sub-title" style=" margin-bottom: 5px; margin-top: 0px; font-size: 14px; line-height: 1.5; color: #e5e3d9; ">To start playing on our platform you have to verify your acount, Click on below link to activate.</p>
 
-                    <p class="sub-title" style=" margin-bottom: 20px; margin-top: 0px; font-size: 14px;  "><a style="color: #e6bd4c;" href="${link}">Activate</a></p>
+                    <p class="sub-title" style=" margin-bottom: 20px; margin-top: 0px; font-size: 14px;  "><a style="color: #e6bd4c;">${link}</a></p>
 
                     <p class="sub-title" style=" margin-bottom: 5px; margin-top: 0px; font-size: 14px; line-height: 1.5; color: #e5e3d9; "> We wish you fruitful use of the #MoonBet platform!
                   </p>

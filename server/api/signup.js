@@ -83,17 +83,10 @@ router.post("/", async (req, res) => {
     user.password = await bcrypt.hash(password, 10);
 
     // Send verification email
-    const verificationToken = crypto.randomBytes(20).toString("hex");
-    user.verificationToken = crypto
-      .createHash("sha256")
-      .update(verificationToken)
-      .digest("hex");
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    user.otp = otp;
 
-    const verificationUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/onboarding/${verificationToken}`;
-
-    const html = verifyHtml(verificationUrl);
+    const html = verifyHtml(otp);
 
     try {
       await sendEmail({
@@ -103,7 +96,7 @@ router.post("/", async (req, res) => {
       });
     } catch (err) {
       console.log(err);
-      user.verificationToken = undefined;
+      user.otp = undefined;
       await user.save();
       return res.status(500).json({ msg: "Error sending verification email" });
     }

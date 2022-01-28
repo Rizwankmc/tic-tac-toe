@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
-    verificationToken: {
+    otp: {
       type: String,
     },
     referBy: {
