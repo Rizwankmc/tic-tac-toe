@@ -8,7 +8,7 @@ import User from "../models/User.model.js";
 // @desc:   Verify email and complete onboarding
 router.post("/:otp", async (req, res) => {
   const { otp } = req.params;
-
+  console.log("otp =>", otp);
   try {
     // Find user with specific verification token
     const user = await User.findOne({ otp });

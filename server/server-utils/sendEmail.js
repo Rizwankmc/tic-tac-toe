@@ -5,7 +5,8 @@ const sendEmail = async (options) => {
     "Sender =>",
     process.env.SENDER_HOST,
     process.env.SENDER_EMAIL,
-    process.env.SENDER_EMAIL_PASSWORD
+    process.env.SENDER_EMAIL_PASSWORD,
+    process.env.SENDER_EMAIL_PORT
   );
   try {
     const transporter = nodemailer.createTransport({
