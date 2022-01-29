@@ -91,7 +91,7 @@ router.post("/", async (req, res) => {
     try {
       await sendEmail({
         to: user.email,
-        subject: "Moon-Bet- Account Verification",
+        subject: "Tic tac toe - Account Verification",
         html,
       });
     } catch (err) {

@@ -1,6 +1,12 @@
 import nodemailer from "nodemailer";
 
 const sendEmail = async (options) => {
+  console.log(
+    "Sender =>",
+    process.env.SENDER_HOST,
+    process.env.SENDER_EMAIL,
+    process.env.SENDER_EMAIL_PASSWORD
+  );
   try {
     const transporter = nodemailer.createTransport({
       service: "webmail",
