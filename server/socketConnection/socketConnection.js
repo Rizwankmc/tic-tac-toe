@@ -1,7 +1,11 @@
 import UserModel from "../models/User.model.js";
 import { isWinner } from "../utils/index.js";
 import jwt from "jsonwebtoken";
-import { playerAction, playerResign } from "../GameLogic/tic-tac-toe.js";
+import {
+  playerAction,
+  playerResign,
+  createGame,
+} from "../GameLogic/tic-tac-toe.js";
 
 const secret = process.env.JWT_SECRET;
 const socketConnection = (io) => {
@@ -48,6 +52,29 @@ const socketConnection = (io) => {
       // soccket to listen player resign
       socket.on("resign", async (data) => {
         await playerResign(io, socket, data);
+      });
+
+      // challenge player
+      socket.on("challenge", async (data) => {
+        const { challengeTo, challengeBy, playerName } = data;
+        io.in(challengeTo).emit("newChallenge", {
+          challengeBy,
+          challengeTo,
+          playerName,
+        });
+      });
+
+      socket.on("challengeAccept", async (data) => {
+        io.in(data.challengeBy).emit("challengeAccepted");
+        await createGame(io, socket, data);
+      });
+
+      socket.on("challengeReject", (data) => {
+        const { challengeBy, challengeTo, playerName } = data;
+        io.in(challengeBy).emit("challengeRejected", {
+          msg: "rejected",
+          playerName,
+        });
       });
 
       // socket to player disconnect

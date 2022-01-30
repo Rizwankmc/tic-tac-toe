@@ -1,4 +1,5 @@
 import tictacRoomModel from "../models/tictacRoom.model.js";
+import UserModel from "../models/User.model.js";
 import { isWinner } from "../utils/index.js";
 
 export const gameStart = async (io, socket, data) => {
@@ -110,6 +111,26 @@ export const playerResign = async (io, socket, data) => {
       ];
     } else {
       socket.emit("actionError", { msg: "No Room Found" });
+    }
+  } catch (error) {
+    console.log("Error in playerResign =>", error);
+  }
+};
+
+export const createGame = async (io, socket, data) => {
+  try {
+    const { challengeBy, challengeTo } = data;
+    const user1 = await UserModel.findOne({ _id: challengeBy });
+    const user2 = await UserModel.findOne({ _id: challengeTo });
+    const room = await tictacRoomModel.create({
+      players: [{ ...user1 }, { ...user2 }],
+      name: `${user1.username} room`,
+    });
+    if (room) {
+      io.in(challengeTo).emit("gameStart", room);
+      io.in(challengeBy).emit("gameStart", room);
+    } else {
+      socket.emit("actionError", { msg: "Some error occured" });
     }
   } catch (error) {
     console.log("Error in playerResign =>", error);
