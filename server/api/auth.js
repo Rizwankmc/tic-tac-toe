@@ -66,7 +66,7 @@ router.post("/", async (req, res) => {
     // Sign JWT and return token
     jwt.sign({ userId: user._id }, process.env.JWT_SECRET, (err, token) => {
       if (err) throw err;
-      res.status(200).json({ token });
+      res.status(200).json({ token, user });
     });
   } catch (err) {
     console.error(err);

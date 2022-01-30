@@ -26,6 +26,7 @@ router.post("/:otp", async (req, res) => {
       res.status(200).json({
         msg: "User verified and onboarded",
         token,
+        user,
       });
     });
   } catch (err) {
