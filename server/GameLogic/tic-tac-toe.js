@@ -1,5 +1,5 @@
-import tictacRoomModel from "../models/tictacRoom.model";
-import { isWinner } from "../utils";
+import tictacRoomModel from "../models/tictacRoom.model.js";
+import { isWinner } from "../utils/index.js";
 
 export const gameStart = async (io, socket, data) => {
   try {
