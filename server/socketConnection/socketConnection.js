@@ -26,7 +26,7 @@ const socketConnection = (io) => {
                 _id: checkVerify.id,
               },
               {
-                online: true,
+                isOnline: true,
               }
             );
             io.emit("newUser", "");
@@ -70,7 +70,7 @@ const socketConnection = (io) => {
                   _id: socket.customId,
                 },
                 {
-                  online: false,
+                  isOnline: false,
                 }
               );
             }
