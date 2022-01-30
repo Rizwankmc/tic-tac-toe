@@ -115,16 +115,3 @@ export const playerResign = async (io, socket, data) => {
     console.log("Error in playerResign =>", error);
   }
 };
-
-export const playerResign = async (io, socket, data) => {
-  try {
-    const { roomId } = data;
-    const roomData = await tictacRoomModel.findOne({ _id: roomId });
-    if (roomData) {
-    } else {
-      socket.emit("actionError", { msg: "No Room Found" });
-    }
-  } catch (error) {
-    console.log("Error in playerResign =>", error);
-  }
-};
