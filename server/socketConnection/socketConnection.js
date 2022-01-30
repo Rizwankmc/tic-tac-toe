@@ -1,6 +1,7 @@
 import UserModel from "../models/User.model.js";
 import { isWinner } from "../utils/index.js";
 import jwt from "jsonwebtoken";
+import { playerAction, playerResign } from "../GameLogic/tic-tac-toe.js";
 
 const secret = process.env.JWT_SECRET;
 const socketConnection = (io) => {
@@ -40,80 +41,13 @@ const socketConnection = (io) => {
         console.log("error in connect block", e.message);
       }
 
-      socket.on("playerActed", (data) => {
-        let isSpace = false;
-        let playerType = data.playerPosition === 1 ? "X" : "O";
-        // update matrix with appropiate position
-        matrix.forEach((row, rowIndex) =>
-          row.forEach((col, colIndex) => {
-            if (col === data.choice) {
-              matrix[rowIndex][colIndex] = playerType;
-              return (isSpace = true);
-            }
-          })
-        );
-        // emit update matrix to both players
-        io.emit("updateMatrix", { matrix });
-
-        // check winner
-
-        if (isWinner(matrix)) {
-          // socket to emit winner
-          io.emit("winner", { winnner: data.playerPosition });
-          matrix = [
-            [1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 9],
-          ];
-        } else {
-          // check for tie
-          let istie = true;
-          matrix.forEach((row) =>
-            row.forEach((col) => {
-              if (typeof col === "number") istie = false;
-            })
-          );
-          if (istie) {
-            // socket to emit game tie message
-            io.emit("gametie");
-            matrix = [
-              [1, 2, 3],
-              [4, 5, 6],
-              [7, 8, 9],
-            ];
-          }
-        }
-        if (isSpace) {
-          // emit socket playerTurn to switch turn and waiting message
-          users.forEach((user, userIndex) => {
-            if (data.playerPosition - 1 === userIndex) {
-              io.to(user).emit("waiting");
-            } else {
-              io.to(user).emit("playerTurn", {
-                playerPosition: userIndex + 1,
-                matrix,
-              });
-            }
-          });
-        } else {
-          // socket to emit player wrong choice if chocie is alreaddy taken
-          socket.emit("notValid", { playerPosition: data.playerPosition });
-        }
+      socket.on("playerActed", async (data) => {
+        await playerAction(io, socket, data);
       });
 
       // soccket to listen player resign
-      socket.on("resign", () => {
-        let loser = users.findIndex((el) => el === socket.id);
-        let winner;
-        if (loser === 0) {
-          winner = 2;
-        } else winner = 1;
-        io.emit("finish", { resignBy: loser + 1, winner });
-        matrix = [
-          [1, 2, 3],
-          [4, 5, 6],
-          [7, 8, 9],
-        ];
+      socket.on("resign", async (data) => {
+        await playerResign(io, socket, data);
       });
 
       // socket to player disconnect
