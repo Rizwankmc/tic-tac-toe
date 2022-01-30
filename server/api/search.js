@@ -54,6 +54,24 @@ router.get("/users/:searchText", auth, async (req, res) => {
   }
 });
 
+// @route:  GET /api/online/users
+// @desc:   Get online users
+router.get("/online/users", auth, async (req, res) => {
+  try {
+    let users = await User.find({
+      isOnline: true,
+      isVerified: true,
+    });
+
+    users = users.filter((user) => user._id.toString() !== req.userId);
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 // @route:  GET /api/search/advanced/users/:searchText
 // @desc:   Get users related to search text
 router.get("/advanced/users/:searchText", async (req, res) => {

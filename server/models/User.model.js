@@ -62,6 +62,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isOnline: { type: Boolean, default: false },
     referalEarnings: {
       type: Number,
       default: 0,
