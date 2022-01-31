@@ -56,26 +56,26 @@ const socketConnection = (io) => {
 
       // challenge player
       socket.on("challenge", async (data) => {
-        const { challengeTo, challengeBy, playerName } = data;
+        const { challengeTo, challengeBy } = data;
         console.log("challenge emit", data);
-        io.in(challengeTo).emit("newChallenge", {
+        io.in(challengeTo._id).emit("newChallenge", {
           challengeBy,
           challengeTo,
-          playerName,
         });
       });
 
       socket.on("challengeAccept", async (data) => {
-        io.in(data.challengeBy).emit("challengeAccepted");
+        io.in(data.challengeBy._id).emit("challengeAccepted");
         await createGame(io, socket, data);
       });
 
       socket.on("challengeReject", (data) => {
         console.log("challenge rejected", data);
-        const { challengeBy, challengeTo, playerName } = data;
-        io.in(challengeBy).emit("challengeRejected", {
+        const { challengeBy, challengeTo } = data;
+        io.in(challengeBy._id).emit("challengeRejected", {
           msg: "rejected",
-          playerName,
+          challengeBy,
+          challengeTo,
         });
       });
 

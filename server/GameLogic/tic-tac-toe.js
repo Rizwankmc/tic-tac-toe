@@ -120,15 +120,25 @@ export const playerResign = async (io, socket, data) => {
 export const createGame = async (io, socket, data) => {
   try {
     const { challengeBy, challengeTo } = data;
-    const user1 = await UserModel.findOne({ _id: challengeBy });
-    const user2 = await UserModel.findOne({ _id: challengeTo });
+    const user1 = await UserModel.findOne({ _id: challengeBy._id });
+    const user2 = await UserModel.findOne({ _id: challengeTo._id });
     const room = await tictacRoomModel.create({
       players: [{ ...user1 }, { ...user2 }],
       name: `${user1.username} room`,
     });
     if (room) {
-      io.in(challengeTo).emit("gameStart", room);
-      io.in(challengeBy).emit("gameStart", room);
+      let time = 10;
+      const interval = setInterval(() => {
+        if (time >= 0) {
+          io.in(challengeTo._id).emit("gameTimer", { leftTime: time });
+          io.in(challengeBy._id).emit("gameTimer", { leftTime: time });
+          time -= 1;
+        } else {
+          clearInterval(interval);
+          io.in(challengeTo._id).emit("gameStart", room);
+          io.in(challengeBy._id).emit("gameStart", room);
+        }
+      }, 1000);
     } else {
       socket.emit("actionError", { msg: "Some error occured" });
     }
