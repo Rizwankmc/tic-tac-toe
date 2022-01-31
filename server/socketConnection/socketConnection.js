@@ -66,6 +66,7 @@ const socketConnection = (io) => {
 
       socket.on("challengeAccept", async (data) => {
         io.in(data.challengeBy._id).emit("challengeAccepted");
+        io.in(data.challengeTo._id).emit("challengeAccepted");
         await createGame(io, socket, data);
       });
 
