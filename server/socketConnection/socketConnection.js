@@ -57,6 +57,7 @@ const socketConnection = (io) => {
       // challenge player
       socket.on("challenge", async (data) => {
         const { challengeTo, challengeBy, playerName } = data;
+        console.log("challenge emit", data);
         io.in(challengeTo).emit("newChallenge", {
           challengeBy,
           challengeTo,
@@ -70,6 +71,7 @@ const socketConnection = (io) => {
       });
 
       socket.on("challengeReject", (data) => {
+        console.log("challenge rejected", data);
         const { challengeBy, challengeTo, playerName } = data;
         io.in(challengeBy).emit("challengeRejected", {
           msg: "rejected",
