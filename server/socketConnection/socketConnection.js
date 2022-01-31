@@ -34,10 +34,10 @@ const socketConnection = (io) => {
               }
             );
             io.emit("newUser", "");
-            console.log(checkVerify.id);
+            console.log("userId =>", checkVerify.id);
             const user = await UserModel.findOne({ _id: checkVerify.id });
             if (user) {
-              socket.join(checkVerify.id.toString() + "notify");
+              socket.join(checkVerify.id.toString());
             }
           }
         }
@@ -94,7 +94,7 @@ const socketConnection = (io) => {
             if (index !== -1) lastSockets.splice(index, 1);
             io.users = lastSockets;
             if (filteredSockets.length === 1) {
-              await User.updateOne(
+              const updateUser = await User.updateOne(
                 {
                   _id: socket.customId,
                 },
@@ -103,6 +103,7 @@ const socketConnection = (io) => {
                 }
               );
             }
+            console.log("Update user =>", updateUser);
             socket.customId = null;
             io.emit("newUser", "");
           }
