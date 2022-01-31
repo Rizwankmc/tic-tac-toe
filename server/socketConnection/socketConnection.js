@@ -22,22 +22,22 @@ const socketConnection = (io) => {
           if (checkVerify) {
             //socket.id = checkVeify.userid;
             let lastSocketData = io.users;
-            lastSocketData.push(checkVerify.id);
+            lastSocketData.push(checkVerify.userId);
             io.users = lastSocketData;
-            socket.customId = checkVerify.id;
+            socket.customId = checkVerify.userId;
             await UserModel.updateOne(
               {
-                _id: checkVerify.id,
+                _id: checkVerify.userId,
               },
               {
                 isOnline: true,
               }
             );
             io.emit("newUser", "");
-            console.log("userId =>", checkVerify.id);
-            const user = await UserModel.findOne({ _id: checkVerify.id });
+            console.log("userId =>", checkVerify.userId);
+            const user = await UserModel.findOne({ _id: checkVerify.userId });
             if (user) {
-              socket.join(checkVerify.id.toString());
+              socket.join(checkVerify.userId.toString());
             }
           }
         }
