@@ -33,7 +33,6 @@ export const playerAction = async (io, socket, data) => {
           ? "X"
           : "0";
       let winner;
-      let isSpace;
       let isTie;
       // update matrix with appropiate position
       matrix.forEach((row, rowIndex) =>
