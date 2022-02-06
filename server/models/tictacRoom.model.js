@@ -9,6 +9,10 @@ const roomSchema = new mongoose.Schema(
       type: Number,
       default: 30,
     },
+    currentPlayer: {
+      type: Number,
+      default: 0,
+    },
     matrix: {
       type: Array,
       default: [
@@ -24,7 +28,11 @@ const roomSchema = new mongoose.Schema(
       default: "empty",
     },
     winner: {
-      type: String,
+      type: Object,
+    },
+    isTie: {
+      type: Boolean,
+      default: false,
     },
     gameFinish: { type: Boolean, default: false },
   },

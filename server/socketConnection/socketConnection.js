@@ -95,7 +95,7 @@ const socketConnection = (io) => {
             if (index !== -1) lastSockets.splice(index, 1);
             io.users = lastSockets;
             if (filteredSockets.length === 1) {
-              const updateUser = await User.updateOne(
+              await UserModel.updateOne(
                 {
                   _id: socket.customId,
                 },

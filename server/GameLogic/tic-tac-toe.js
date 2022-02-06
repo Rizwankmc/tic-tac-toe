@@ -23,68 +23,62 @@ export const gameStart = async (io, socket, data) => {
 
 export const playerAction = async (io, socket, data) => {
   try {
-    const { playerPosition, roomId } = data;
+    const { userId, roomId, choice } = data;
     const roomData = await tictacRoomModel.findOne({ _id: roomId });
     if (roomData) {
       let { matrix } = roomData;
       let isSpace = false;
-      let playerType = playerPosition === 1 ? "X" : "O";
+      let playerType =
+        roomData.players.findIndex((player) => player._id === userId) === 0
+          ? "X"
+          : "0";
+      let winner;
+      let isSpace;
+      let isTie;
       // update matrix with appropiate position
       matrix.forEach((row, rowIndex) =>
         row.forEach((col, colIndex) => {
-          if (col === data.choice) {
+          if (col === choice) {
             matrix[rowIndex][colIndex] = playerType;
             return (isSpace = true);
           }
         })
       );
-      // emit update matrix to both players
-      io.emit("updateMatrix", { matrix });
 
       // check winner
-
       if (isWinner(matrix)) {
-        // socket to emit winner
-        io.emit("winner", { winnner: playerPosition });
-        matrix = [
-          [1, 2, 3],
-          [4, 5, 6],
-          [7, 8, 9],
-        ];
+        winner = roomData.players.find((el) => el._id === userId);
       } else {
         // check for tie
-        let istie = true;
+        isTie = true;
         matrix.forEach((row) =>
           row.forEach((col) => {
-            if (typeof col === "number") istie = false;
+            if (typeof col === "number") isTie = false;
           })
         );
-        if (istie) {
-          // socket to emit game tie message
-          io.emit("gametie");
-          matrix = [
-            [1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 9],
-          ];
-        }
       }
+
       if (isSpace) {
         // emit socket playerTurn to switch turn and waiting message
-        users.forEach((user, userIndex) => {
-          if (data.playerPosition - 1 === userIndex) {
-            io.to(user).emit("waiting");
-          } else {
-            io.to(user).emit("playerTurn", {
-              playerPosition: userIndex + 1,
-              matrix,
-            });
-          }
-        });
+        currentPlayer = roomData.players.find(
+          (player) => player._id !== userId
+        )._id;
       } else {
         // socket to emit player wrong choice if chocie is alreaddy taken
         socket.emit("notValid", { playerPosition: data.playerPosition });
       }
+      await tictacRoomModel.updateOne(
+        { _id: roomId },
+        {
+          matrix,
+          isTie,
+          currentPlayer,
+          winner,
+        }
+      );
+      const updatedRoom = await tictacRoomModel.findOne({ _id: roomId });
+      // emit update matrix to both players
+      io.emit("updateMatrix", updatedRoom);
     } else {
       socket.emit("actionError", { msg: "No room found" });
     }
@@ -125,6 +119,7 @@ export const createGame = async (io, socket, data) => {
     const room = await tictacRoomModel.create({
       players: [{ ...user1 }, { ...user2 }],
       name: `${user1.username} room`,
+      currentPlayer: user1._id,
     });
     if (room) {
       let time = 10;
