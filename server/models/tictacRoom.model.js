@@ -10,8 +10,8 @@ const roomSchema = new mongoose.Schema(
       default: 30,
     },
     currentPlayer: {
-      type: Number,
-      default: 0,
+      type: String,
+      default: "",
     },
     matrix: {
       type: Array,
