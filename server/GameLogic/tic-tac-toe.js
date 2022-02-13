@@ -24,6 +24,7 @@ export const gameStart = async (io, socket, data) => {
 export const playerAction = async (io, socket, data) => {
   try {
     const { userId, roomId, choice } = data;
+    console.log("player action =>", data);
     const roomData = await tictacRoomModel.findOne({ _id: roomId });
     let currentPlayer;
     if (roomData) {
@@ -67,6 +68,7 @@ export const playerAction = async (io, socket, data) => {
         // socket to emit player wrong choice if chocie is alreaddy taken
         socket.emit("notValid", { playerPosition: data.playerPosition });
       }
+      console.log("currentPlayer =>", currentPlayer);
       await tictacRoomModel.updateOne(
         { _id: roomId },
         {
