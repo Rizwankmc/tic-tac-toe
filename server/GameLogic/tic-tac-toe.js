@@ -89,7 +89,7 @@ export const playerAction = async (io, socket, data) => {
         updatedRoom
       );
       io.in(updatedRoom.players[1]._id.toString()).emit(
-        "updatematrix",
+        "updateMatrix",
         updatedRoom
       );
     } else {
