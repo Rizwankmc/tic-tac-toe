@@ -31,7 +31,9 @@ export const playerAction = async (io, socket, data) => {
       let { matrix } = roomData;
       let isSpace = false;
       let playerType =
-        roomData.players.findIndex((player) => player._id === userId) === 0
+        roomData.players.findIndex(
+          (player) => player._id.toString() === userId.toString()
+        ) === 0
           ? "X"
           : "0";
       let winner;
@@ -48,7 +50,9 @@ export const playerAction = async (io, socket, data) => {
 
       // check winner
       if (isWinner(matrix)) {
-        winner = roomData.players.find((el) => el._id === userId);
+        winner = roomData.players.find(
+          (el) => el._id.toString() === userId.toString()
+        );
       } else {
         // check for tie
         isTie = true;
@@ -62,7 +66,7 @@ export const playerAction = async (io, socket, data) => {
       if (isSpace) {
         // emit socket playerTurn to switch turn and waiting message
         currentPlayer = roomData.players.find(
-          (player) => player._id !== userId
+          (player) => player._id.toString() !== userId.toString()
         )._id;
       } else {
         // socket to emit player wrong choice if chocie is alreaddy taken
@@ -80,7 +84,8 @@ export const playerAction = async (io, socket, data) => {
       );
       const updatedRoom = await tictacRoomModel.findOne({ _id: roomId });
       // emit update matrix to both players
-      io.emit("updateMatrix", updatedRoom);
+      io.in(userId).emit("updateMatrix", updatedRoom);
+      io.in(currentPlayer.toString()).emit("updatematrix", updatedRoom);
     } else {
       socket.emit("actionError", { msg: "No room found" });
     }
@@ -94,7 +99,9 @@ export const playerResign = async (io, socket, data) => {
     const { roomId, userId } = data;
     const roomData = await tictacRoomModel.findOne({ _id: roomId });
     if (roomData) {
-      let loser = roomData.players.findIndex((el) => el.id === userId);
+      let loser = roomData.players.findIndex(
+        (el) => el.id.toString() === userId
+      );
       let winner;
       if (loser === 0) {
         winner = 2;
