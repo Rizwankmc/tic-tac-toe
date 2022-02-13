@@ -84,8 +84,14 @@ export const playerAction = async (io, socket, data) => {
       );
       const updatedRoom = await tictacRoomModel.findOne({ _id: roomId });
       // emit update matrix to both players
-      io.in(userId).emit("updateMatrix", updatedRoom);
-      io.in(currentPlayer.toString()).emit("updatematrix", updatedRoom);
+      io.in(updatedRoom.players[0]._id.toString()).emit(
+        "updateMatrix",
+        updatedRoom
+      );
+      io.in(updatedRoom.players[1]._id.toString()).emit(
+        "updatematrix",
+        updatedRoom
+      );
     } else {
       socket.emit("actionError", { msg: "No room found" });
     }
@@ -145,8 +151,8 @@ export const createGame = async (io, socket, data) => {
             io.in(challengeBy._id).emit("welcome", room);
             const interval1 = setInterval(() => {
               if (gameTime >= 0) {
-                io.in(challengeTo._id).emit("preTimer", { leftTime: time });
-                io.in(challengeBy._id).emit("preTImer", { leftTime: time });
+                io.in(challengeTo._id).emit("preTimer", { leftTime: gameTime });
+                io.in(challengeBy._id).emit("preTImer", { leftTime: gameTime });
                 gameTime -= 1;
               } else {
                 clearInterval(interval1);
