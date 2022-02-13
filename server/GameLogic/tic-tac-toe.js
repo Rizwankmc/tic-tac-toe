@@ -25,6 +25,7 @@ export const playerAction = async (io, socket, data) => {
   try {
     const { userId, roomId, choice } = data;
     const roomData = await tictacRoomModel.findOne({ _id: roomId });
+    let currentPlayer;
     if (roomData) {
       let { matrix } = roomData;
       let isSpace = false;
@@ -129,8 +130,22 @@ export const createGame = async (io, socket, data) => {
           time -= 1;
         } else {
           clearInterval(interval);
-          io.in(challengeTo._id).emit("gameStart", room);
-          io.in(challengeBy._id).emit("gameStart", room);
+          setTimeout(() => {
+            let gameTime = 3;
+            io.in(challengeTo._id).emit("welcome", room);
+            io.in(challengeBy._id).emit("welcome", room);
+            const interval1 = setInterval(() => {
+              if (gameTime >= 0) {
+                io.in(challengeTo._id).emit("preTimer", { leftTime: time });
+                io.in(challengeBy._id).emit("preTImer", { leftTime: time });
+                gameTime -= 1;
+              } else {
+                clearInterval(interval1);
+                io.in(challengeTo._id).emit("gameStart", room);
+                io.in(challengeBy._id).emit("gameStart", room);
+              }
+            }, 1000);
+          }, 1000);
         }
       }, 1000);
     } else {
