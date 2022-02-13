@@ -65,9 +65,9 @@ export const playerAction = async (io, socket, data) => {
 
       if (isSpace) {
         // emit socket playerTurn to switch turn and waiting message
-        currentPlayer = roomData.players.find(
-          (player) => player._id.toString() !== userId.toString()
-        )._id;
+        currentPlayer = roomData.players
+          .find((player) => player._id.toString() !== userId.toString())
+          ._id.toString();
       } else {
         // socket to emit player wrong choice if chocie is alreaddy taken
         socket.emit("notValid", { playerPosition: data.playerPosition });
